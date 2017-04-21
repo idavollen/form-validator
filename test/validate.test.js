@@ -62,7 +62,7 @@ describe('Form validators', function() {
         'income': [
             builtInValidators.isRequired('income should be given'), 
             builtInValidators.isNumber('valid income should be digits'), 
-            builtInValidators.range('income should be between 0 and 100000000', 0, 100000000)
+            builtInValidators.range('income should be between 0 and 100000000', 1, 100000000)
           ],
         'address':[
           builtInValidators.isString('valid address should be string'), 
@@ -85,10 +85,17 @@ describe('Form validators', function() {
       assert.equal(3, msg.length);
     });
 
+    it('should income of "" return 1 validation error when stopOnErr is true', function () {
+      var msg = formvalidators.validateField('income', '', {}, true);
+      assert.equal(1, msg.length);
+      assert.equal('income should be given', msg[0])
+    });
+
     it('address of 3 letters is too short', function () {
       var msg = formvalidators.validateField('address', 'vei');
       assert.equal(1, msg.length);
     });
+
 
     it('should validate form well when its fields is valid', function () {
       var msg = formvalidators.validateForm({'income': 500000, address: 'Harry Fetts Vei'});
@@ -127,6 +134,45 @@ describe('Form validators', function() {
       assert.equal(undefined, msg);
       msg = formvalidators.validateField('sex', 'man');
       assert.equal(1, msg.length);
+    });
+
+    it('options validator should work with enum 0', function () {
+      formvalidators.addValidator('status', builtInValidators.options('enable or disable', 0, 1))
+      var msg = formvalidators.validateField('status', 0);
+      assert.equal(undefined, msg);
+      msg = formvalidators.validateField('status', 2);
+      assert.equal(1, msg.length);
+    });
+
+    it('valid email should have at least 3 parts', function () {
+      formvalidators.addValidator('email', builtInValidators.isEmail('email should look like name@example.com'));
+      var msg = formvalidators.validateField('email', 'aa@bb.cc');
+      assert.equal(undefined, msg);
+      msg = formvalidators.validateField('email', 'aa@cc.c');
+      assert.equal(1, msg.length);
+    });
+
+    it('confirm email should have the same as the first email', function () {
+      formvalidators.addValidator('email', builtInValidators.isEmail('email should look like name@example.com'));
+      formvalidators.addValidator('email2', builtInValidators.isSame('email2 should have the same as email', 'email'));
+      var msg = formvalidators.validateField('email', 'aa@bb.cc');
+      assert.equal(undefined, msg);
+      msg = formvalidators.validateField('email2', 'aa@cc.no', {email: 'aa@bb.cc'});
+      assert.equal(1, msg.length);
+      msg = formvalidators.validateField('email2', 'aa@bb.cc', {email: 'aa@bb.cc'});
+      assert.equal(undefined, msg);
+    });
+
+    it('dynamic validator validate value based on contextFields', function () {
+      formvalidators.addValidator('employer', builtInValidators.isRequired('employer is needed', function(value, contextFields) {
+        return (contextFields && ('employee' == contextFields.employment || 'temp' == contextFields.employment))
+      }));
+      var msg = formvalidators.validateField('employer', '', { employment: 'employee'});
+      assert.equal(1, msg.length);
+      msg = formvalidators.validateField('employer', 'Finn.no', { employment: 'employee'});
+      assert.equal(undefined, msg);
+      msg = formvalidators.validateField('employer', '', { employment: 'student'});
+      assert.equal(undefined, msg);
     });
 
     it('if value is a function, it should be called during validating', function () {

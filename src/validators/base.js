@@ -4,13 +4,13 @@ const  Validator = function(ruleName, ruleExpression, errMsg) {
   this.errMsg = errMsg;
 }
 
-Validator.prototype.validate = function(value) {
-  let valid = this.evaluate(value);
+Validator.prototype.validate = function(value, contextFields) {
+  let valid = this.evaluate(value, contextFields);
   if (!valid) return this.errMsg;
 }
 
-Validator.prototype.evaluate = function(value) {
-  return typeof this.expression === 'function'? this.expression(value) : this.expression;
+Validator.prototype.evaluate = function(value, contextFields) {
+  return typeof this.expression === 'function'? this.expression(value, contextFields) : this.expression;
 }
 
 const  Pattern = function(regexp, errMsg) {

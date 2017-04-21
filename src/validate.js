@@ -83,12 +83,16 @@ export default function createValidators(configs) {
       _configs[field] = existing;
     },
 
-    validateField: function(field, value) {
-      var result = _configs[field].reduce((prev, validator) => {
-        var err = validator.validate(value);
-        if (err) prev.push(err);
-        return prev;
-      }, []);
+    // flag stopOnErr, if true, the validating process stops on the first validator that failed
+    validateField: function(field, value, contextFields, stopOnErr=false) {
+      var result = []
+      _configs[field].some(validator => {
+        var err = validator.validate(value, contextFields);
+        if (err) {
+          result.push(err);
+          return stopOnErr;
+        }
+      });
       return result.length? result : undefined;
     },
 
@@ -96,7 +100,7 @@ export default function createValidators(configs) {
     validateForm: function(formData) {
       var result;
       for (let key in formData) {
-        let err = this.validateField(key, formData[key]);
+        let err = this.validateField(key, formData[key], formData);
         if (err) {
           if (!result) result = {};
           result[key] = err;

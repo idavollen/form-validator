@@ -2,9 +2,18 @@ import {Validator, Pattern} from './base';
 
 export const isRequired = (errMsg, required = true) => {
   var validator = new Validator('required', required, errMsg);
-  validator.evaluate = (value) => {
-    let required = Validator.prototype.evaluate.call(validator, value);
+  validator.evaluate = (value, contextFields) => {
+    let required = Validator.prototype.evaluate.call(validator, value, contextFields);
     return !required || (value != undefined && value != '' && /.+/.test(value));
+  }
+  return validator;
+}
+
+//validate this field SHOULD have the same value as the peer field
+export const isSame = (errMsg, peer) => {
+  var validator = new Validator('thesame', peer, errMsg);
+  validator.evaluate = (value, contextFields) => {
+    return contextFields && value == contextFields[peer]
   }
   return validator;
 }
@@ -35,7 +44,7 @@ export const range = (errMsg, ...range) => {
     throw new TypeError('Invalid type for range, it should be array')
   var validator = new Validator('range', range, errMsg);
   validator.evaluate = (value) => {
-    return value && value >= validator.expression[0] && value <= validator.expression[1];
+    return value != undefined && value >= validator.expression[0] && value <= validator.expression[1];
   }
   return validator;
 }
@@ -43,10 +52,9 @@ export const range = (errMsg, ...range) => {
 //the same as reserved keyword 'enum', 'options' is an array of possible values
 //and the value to be evaluated should be one of enum
 export const options = (errMsg, ...options) => {
-  options = options.reduce((prev, cur) => prev.concat(cur), []);
   var validator = new Validator('options', options, errMsg);
   validator.evaluate = (value) => {
-    return value && validator.expression.indexOf(value) !== -1;
+    return value !== undefined && validator.expression.some(o => o == value);
   }
   return validator;
 }

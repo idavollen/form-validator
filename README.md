@@ -10,6 +10,7 @@ A simple form validator is easy, flexible to use
 
 ```
 npm install --save simple-form-validator
+
 ```
 
 This assumes that you’re using [npm](http://npmjs.com/) package manager with a module bundler like [Webpack](http://webpack.github.io) or [Browserify](http://browserify.org/) to consume [CommonJS modules](http://webpack.github.io/docs/commonjs.html).
@@ -18,34 +19,36 @@ This assumes that you’re using [npm](http://npmjs.com/) package manager with a
 
 ## Documentation
 
-- [createValidators] initialize validators with validator settings
-	1. [validator setting can be an object describing validators for form field] 
+- [ **createValidators**] initialize validators with validator settings
+	1. [**validator setting can be an object describing validators for form field**] 
         ```javascript
-						var validatorsConfig = {
-				      name: [{
-				          required: true,
-				          msg: 'name cannot be empty'
-				        }, {
-				          pattern: 'string',
-				          msg: 'name should be string'
-				        }],
-				      age: [
-				        {
-				          required: true,
-				          msg: 'age should be provided'
-				        }, {
-				          pattern: 'digits',
-				          msg: 'age should be digits'
-				        }
-				      ]
-				    }
-				    validators = createValidators(validatorsConfig);
+
+				var validatorsConfig = {
+			      name: [{
+			          required: true,
+			          msg: 'name cannot be empty'
+			        }, {
+			          pattern: 'string',
+			          msg: 'name should be string'
+			        }],
+			      age: [
+			        {
+			          required: true,
+			          msg: 'age should be provided'
+			        }, {
+			          pattern: 'digits',
+			          msg: 'age should be digits'
+			        }
+			      ]
+			    }
+			    validators = createValidators(validatorsConfig);
+
         ```
         each validator object must have two keys, one of which should be **_msg_** , the other of which could be **_required_**, **_length_**, **_options_**, **_pattern_**, **_match_** and is case-sensitive, moreover, value for these keys could be a *function*
-	2. [validator setting can be collections of built-in validators for each form field]
+	2. [**validator setting can be collections of built-in validators for each form field**]
 
         ```javascript
-					validators = createValidators({
+				validators = createValidators({
 		        'income': [
 		            builtInValidators.isRequired('income should be given'), 
 		            builtInValidators.isNumber('valid income should be digits'), 
@@ -59,20 +62,19 @@ This assumes that you’re using [npm](http://npmjs.com/) package manager with a
 			    validators = createValidators(validatorsConfig);
         ```
 		
-- [addValidator] After a form validator is initialized, it is able to dynamically add validators to an existing form field or a brand new field, i.e. (see more example in validate.test.js) 
+- [**addValidator**] After a form validator is initialized, it is able to dynamically add validators to an existing form field or a brand new field, i.e. (see more example in validate.test.js) 
             
     ```javascript
-                    
-        					validators.addValidator('employer', builtInValidators.isRequired('employer should be provided', function() {
-        		        if (emp === 'student') return false;
-        		        else if (emp === 'developer') return true;
-        		      }))
+		validators.addValidator('employer', builtInValidators.isRequired('employer should be provided', function() {
+        if (emp === 'student') return false;
+        else if (emp === 'developer') return true;
+      }))
     ```
-- [validateField] When a form field has changed its contents or lost focus, *validateField* can be called to validate it. If its value doesn't satisfy rules of its validators, the corresponding validating error message will be returned. To return *undefined* means there is no validating errors
+- [**validateField**] When a form field has changed its contents or lost focus, *validateField* can be called to validate it. If its value doesn't satisfy rules of its validators, the corresponding validating error message will be returned. To return *undefined* means there is no validating errors
 
-- [validateForm] *validateForm* can be called to validate an entire form or just a port of it. Imagine that you have a Accordion showing a complex form and navigate from part 1 to part 2, and part 1 should validated before part 2 is to be shown. Return value of *undefined* for this method means there is no validating errors
+- [**validateForm**] *validateForm* can be called to validate an entire form or just a port of it. Imagine that you have a Accordion showing a complex form and navigate from part 1 to part 2, and part 1 should validated before part 2 is to be shown. Return value of *undefined* for this method means there is no validating errors
 
-- [built-in validators] for the time being, there are eight built-in validators, *isRequired*, *isNumber*, *isString*, *isEmail*, *range*, *length*, *options*, *match*. The last one is provided for your customized need because you can send your own javascript RegExp
+- [**built-in validators**] for the time being, there are eight built-in validators, *isRequired*, *isNumber*, *isString*, *isEmail*, *range*, *length*, *options*, *match*. The last one is provided for your customized need because you can send your own javascript RegExp
 
 ## Other Usage
 
