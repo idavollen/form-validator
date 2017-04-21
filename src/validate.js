@@ -1,6 +1,10 @@
 import * as BuiltInValidators from './validators/validator.js';
 import { Validator, Pattern } from './validators/base';
 
+export const createValidator = ({ msg, validate }) => ({
+  validate: (val, contextFields) => !validate(val, contextFields) && msg
+})
+
 export default function createValidators(configs) {
   /*
     {name: [{
@@ -13,9 +17,14 @@ export default function createValidators(configs) {
     }
   */
   const _makeValidator = (validatorObj) => {
+    if (validatorObj.validate && typeof validatorObj.validate === 'function') {
+      return validatorObj
+    }
     if (!validatorObj.msg) return;
     if (validatorObj.required !== undefined) 
       return BuiltInValidators.isRequired(validatorObj.msg, validatorObj.required);
+    else if (validatorObj.sameas)
+        return BuiltInValidators.isSame(validatorObj.msg, validatorObj.sameas);
     else if (validatorObj.length) 
       return BuiltInValidators.length(validatorObj.length, validatorObj.msg);
     else if (validatorObj.range)
