@@ -20,8 +20,7 @@ This assumes that you’re using [npm](http://npmjs.com/) package manager with a
 ## Documentation
 
 - [ **createValidators**] initialize validators with validator settings
-	1. [**validator setting can be an object describing validators for form field**] 
-	each validator object must have two keys, one of which should be **_msg_** , the other of which could be **_required_**, **_length_**, **_sameas_**, **_options_**, **_pattern_**, **_match_** and is case-sensitive, moreover, value for these keys could be a *function*
+	1. [**validator setting can be an object describing validators for form field**] each validator object must have two keys, one of which should be **_msg_** , the other of which could be **_required_**, **_length_**, **_sameas_**, **_options_**, **_pattern_**, **_match_** and is case-sensitive, moreover, value for these keys could be a *function*
 	
     ```javascript
   	var validatorsConfig = {

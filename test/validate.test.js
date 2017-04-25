@@ -77,7 +77,7 @@ describe('Form validators', function() {
       const contextFields = { pw: '12345678' }
       var errMsg = validators.validateField('pw', '12345678');
       assert.equal(undefined, errMsg);
-      errMsg = validators.validateField('pw2', '123456789', contextFields)
+      errMsg = validators.validateField('pw2', '12345679', contextFields)
       assert.equal(1, errMsg.length);
       errMsg = validators.validateField('pw2', '12345678', contextFields)
       assert.equal(undefined, errMsg);
@@ -124,7 +124,7 @@ describe('Form validators', function() {
           ],
         'address':[
           builtinValidators.isString('valid address should be string'), 
-          builtinValidators.length(5, 'valid address should be at least 5 letters')
+          builtinValidators.length('valid address should be at least 5 letters', 5)
           ]
         })
     });
@@ -150,12 +150,12 @@ describe('Form validators', function() {
 
 
     it('should validate form well when its fields is valid', function () {
-      var msg = formvalidators.validateForm({'income': 500000, address: 'Harry Fetts Vei'});
+      var msg = formvalidators.validateForm({income: 500000, address: 'Fetts'});
       assert.equal(undefined, msg);
     });
 
     it('should return validation err if form data is invalid', function () {
-      var msg = formvalidators.validateForm({'income': 500000, address: 'Vei'});
+      var msg = formvalidators.validateForm({income: 500000, address: 'Vei'});
       assert.equal(1, msg.address.length);
     });
 
@@ -175,10 +175,46 @@ describe('Form validators', function() {
     });
 
     it('the newly added validator should be applicable', function () {
+      var msg = formvalidators.validateField('address', 'Kongeveien')
+      assert.equal(1, msg.length);
     	formvalidators.addValidator('address', builtinValidators.length(2, 'valid address should be at least 2 letters'))
-      var msg = formvalidators.validateField('address', 'vei');
-      assert.equal(undefined, msg);
+      msg = formvalidators.validateField('address', 'harry');
+      assert.equal(1, msg.length);
+
     });
+
+    it('length validator should be able to handle all types', function () {
+      formvalidators.addValidator('cdIdent', builtinValidators.length('valid cdIdent should have length of 3', 3))
+      var msg = formvalidators.validateField('cdIdent', 'harry');
+      assert.equal(1, msg.length);
+      msg = formvalidators.validateField('cdIdent', 'vie')
+      assert.equal(undefined, msg);
+      msg = formvalidators.validateField('cdIdent', ['vi', 'er', 'verden'])
+      assert.equal(undefined, msg);
+      msg = formvalidators.validateField('cdIdent', 123)
+      assert.equal(undefined, msg);
+      msg = formvalidators.validateField('cdIdent', {a: 1, b: 3, c: 5})
+      assert.equal(undefined, msg);
+
+    });
+
+    it('length validator should be able to handle minLength and maxLength', function () {
+      formvalidators.addValidator('cdIdent', builtinValidators.length('valid cdIdent should have length of 3', 3, 5))
+      var msg = formvalidators.validateField('cdIdent', 'harry');
+      assert.equal(undefined, msg);
+      msg = formvalidators.validateField('cdIdent', 'vie')
+      assert.equal(undefined, msg);
+      msg = formvalidators.validateField('cdIdent', 12)
+      assert.equal(1, msg.length);
+      msg = formvalidators.validateField('cdIdent', 123)
+      assert.equal(undefined, msg);
+      msg = formvalidators.validateField('cdIdent', 1234)
+      assert.equal(undefined, msg);
+      msg = formvalidators.validateField('cdIdent', 'trump donald')
+      assert.equal(1, msg.length);
+
+    });
+
 
     it('options validator should work as enum', function () {
       formvalidators.addValidator('sex', builtinValidators.options('sex should have only two valid possible values', 'male', 'female'))

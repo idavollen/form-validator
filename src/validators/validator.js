@@ -30,10 +30,15 @@ export const isEmail = (errMsg) => {
   return new Pattern(/^[\w-]+(\.[\w-]+)*@([a-z0-9-]+(\.[a-z0-9-]+)*?\.[a-z]{2,6}|(\d{1,3}\.){3}\d{1,3})(:\d{4})?$/, errMsg);
 }
 
-export const length = (strlength, errMsg) => {
-  var validator = new Validator('length', strlength, errMsg);
+export const length = (errMsg, ...lengths) => {
+  var validator = new Validator('length', lengths, errMsg);
   validator.evaluate = (value) => {
-    return value && value.length >= validator.expression;
+    if (value) {
+      let l
+      l = typeof value === 'object'? Object.keys(value).length : typeof value === 'number'? String(value).length : value.length
+      if (validator.expression.length > 1) return l >= validator.expression[0] && l <= validator.expression[1]
+      return l == validator.expression
+    }
   }
   return validator;
 }

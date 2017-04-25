@@ -26,7 +26,7 @@ export default function createValidators(configs) {
     else if (validatorObj.sameas)
         return BuiltInValidators.isSame(validatorObj.msg, validatorObj.sameas);
     else if (validatorObj.length) 
-      return BuiltInValidators.length(validatorObj.length, validatorObj.msg);
+      return BuiltInValidators.length(validatorObj.msg, validatorObj.length);
     else if (validatorObj.range)
       return BuiltInValidators.range(validatorObj.msg, validatorObj.range)
     else if (validatorObj.options)
